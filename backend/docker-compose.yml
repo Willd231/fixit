@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # SQL Server database
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:latest
+    container_name: fixit-sqlserver
+    environment:
+      SA_PASSWORD: "YourPassword123!"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql/data
+    networks:
+      - fixit-network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YourPassword123! -Q 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # FixIt API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fixit-api
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=FixItDb;User Id=sa;Password=YourPassword123!;MultipleActiveResultSets=true;"
+      JwtSettings__SecretKey: "docker-secret-key-for-testing-change-in-production-minimum-32-characters!"
+      JwtSettings__Issuer: "FixIt"
+      JwtSettings__Audience: "FixItClient"
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    networks:
+      - fixit-network
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  sqlserver-data:
+    driver: local
+
+networks:
+  fixit-network:
+    driver: bridge

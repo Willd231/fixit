@@ -28,7 +28,7 @@ builder.Host.UseSerilog();
 // Database
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<FixItDbContext>(options =>
-    options.UseSqlServer(connectionString, b => b.MigrationsAssembly("FixitBackend")));
+    options.UseSqlite(connectionString, b => b.MigrationsAssembly("FixitBackend")));
 
 // Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()

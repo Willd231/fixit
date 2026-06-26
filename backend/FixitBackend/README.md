@@ -22,7 +22,7 @@ A professional-grade ASP.NET Core Web API backend for a help-desk and issue-trac
 - **.NET 9.0** - Latest .NET runtime
 - **ASP.NET Core** - Web API framework
 - **Entity Framework Core 9.0** - ORM and database context
-- **SQL Server** - Relational database
+- **SQLite** - Lightweight, file-based database (zero configuration)
 - **ASP.NET Core Identity** - User authentication and authorization
 - **JWT (JSON Web Tokens)** - Stateless authentication
 - **AutoMapper** - Object-to-object mapping
@@ -33,10 +33,10 @@ A professional-grade ASP.NET Core Web API backend for a help-desk and issue-trac
 ## Prerequisites
 
 - **.NET 9.0 SDK** or later ([download](https://dotnet.microsoft.com/download))
-- **SQL Server** 2019 or later (LocalDB, Express, or Full)
-  - Or **Docker** for SQL Server containerization
 - **Visual Studio** 2022 or **Visual Studio Code** with C# extensions
 - **Git** for version control
+
+**Note:** SQLite is included - no database server installation needed!
 
 ## Local Setup
 
@@ -47,47 +47,25 @@ git clone <repository-url>
 cd FixIt/backend/FixitBackend
 ```
 
-### 2. SQL Server Setup
+### 2. Database Setup
 
-#### Option A: Using LocalDB (Windows)
+This project uses **SQLite** - a zero-configuration database. The database file will be created automatically when you run migrations. No installation needed!
 
-LocalDB is installed with Visual Studio. Create the database:
+**Database files:**
+- `fixit.db` - Production database
+- `fixit-dev.db` - Development database (created automatically)
 
-```bash
-sqlcmd -S (localdb)\mssqllocaldb
-CREATE DATABASE FixItDb_Dev;
-GO
-EXIT
-```
+### 3. Run the Application
 
-#### Option B: Using SQL Server Express
-
-Install [SQL Server Express](https://www.microsoft.com/sql-server/sql-server-downloads) and create the database.
-
-#### Option C: Using Docker
+The database connection is pre-configured for SQLite. Simply restore dependencies and run:
 
 ```bash
-docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=YourPassword123!" -p 1433:1433 -d mcr.microsoft.com/mssql/server:latest
+dotnet restore
+dotnet ef database update
+dotnet run
 ```
 
-Then create the database using SQL Management Studio or sqlcmd.
-
-### 3. Update Connection String
-
-Edit `appsettings.Development.json`:
-
-```json
-"ConnectionStrings": {
-  "DefaultConnection": "Server=<your-server>;Database=FixItDb_Dev;User Id=<user>;Password=<password>;MultipleActiveResultSets=true;"
-}
-```
-
-Examples:
-- **LocalDB**: `Server=(localdb)\mssqllocaldb;Database=FixItDb_Dev;Trusted_Connection=true;`
-- **SQL Server Express**: `Server=localhost\SQLEXPRESS;Database=FixItDb_Dev;Trusted_Connection=true;`
-- **Docker**: `Server=localhost,1433;Database=FixItDb_Dev;User Id=sa;Password=YourPassword123!;`
-
-### 4. JWT Secret Configuration
+The API will start at: `https://localhost:7001` (HTTPS) or `http://localhost:5000` (HTTP)
 
 Update `appsettings.json` with a strong JWT secret (minimum 32 characters):
 

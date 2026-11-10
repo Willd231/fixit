@@ -1,60 +1,46 @@
-# FixIt Issue Tracking System 2025
+# FixIt
 
-A professional-grade help-desk and issue-tracking system built with modern technologies. This repository contains both a React + TypeScript frontend and a comprehensive ASP.NET Core backend API with JWT authentication, Entity Framework Core, and SQL Server.
+A help-desk ticketing app I'm building, modeled on the ticket workflow I use day to day as an MSP technician. Requesters submit tickets, the tickets get routed to teams and technicians, and every change is logged on the ticket.
 
-## Features
+**Status: work in progress.** The React frontend runs today against a built-in mock API. The ASP.NET Core backend has its domain model, services and endpoints written, but it isn't wired to the frontend yet (see [Roadmap](#roadmap)).
 
-### Frontend (React + TypeScript + Vite)
-- **Modern UI** with responsive design using React Router v6 and TanStack Query
-- **Ticket Management**: Create, view, update, and resolve support tickets
-- **Advanced Search & Filtering**: Search by ticket number, title, status, priority, category, team, technician
-- **Dashboard**: Real-time metrics and recent ticket activity
-- **Comments & Activity History**: Track all ticket changes and discussions
-- **Team & User Management**: View technicians and support teams
-- **Authentication Ready**: Integration with JWT-based backend authentication
-- **Form Validation**: React Hook Form with Zod schema validation
-- **Type-Safe**: Full TypeScript in strict mode
+## What it does
 
-### Backend (ASP.NET Core + Entity Framework Core)
-- **RESTful API** with comprehensive endpoint documentation via Swagger/OpenAPI
-- **JWT Authentication** with role-based access control (Administrator, SupportManager, Technician, Requester)
-- **Ticket Lifecycle Management**: Full CRUD operations with status tracking, assignment, resolution
-- **Activity Tracking**: Automatic logging of all ticket changes
-- **Comments & Attachments**: Support for ticket discussions and file uploads
-- **Advanced Filtering**: Complex queries with search, status, priority, category, team, date range filters
-- **Pagination & Sorting**: Efficient data retrieval with configurable page sizes
-- **Dashboard & Reporting**: Statistics, trends, and technician workload analysis
-- **Soft Deletion**: Preserve audit trail with logical deletion
-- **Entity Framework Core** with SQL Server and migrations
-- **Comprehensive Logging**: Serilog integration with file and console output
-- **Docker Support**: Dockerfile and docker-compose for containerization
+**Frontend (React + TypeScript), runs now on mock data**
+- Dashboard with counts of open, critical, unassigned and resolved-this-week tickets, plus the five most recent tickets
+- Ticket list with search across title, description and ticket number, and status and priority badges
+- Ticket creation form validated with React Hook Form + Zod
+- Ticket detail page with description, activity log and comments, plus buttons to resolve, reopen and delete
+- Teams, Technicians and Reports pages
 
-## Technology Stack
+**Backend (ASP.NET Core 9 Web API), written but not yet running end to end**
+- Tickets numbered `FIX-<year>-000001`, moving through New → Open → In Progress → Pending → Resolved → Closed
+- Priorities from Low to Critical, and categories: Hardware, Software, Network, Account Access, Security, Email, Other
+- Role-based access with ASP.NET Identity + JWT, using four roles: Administrator, SupportManager, Technician, Requester. For example, only managers can assign tickets and only admins can delete them.
+- An activity entry is logged automatically for every change: created, status, category, assignment, resolve, reopen, close, delete
+- Comments with an internal-note flag. Tickets and comments are soft-deleted.
+- Ticket filtering by status, priority, category, team, technician, requester and date range, with sorting and pagination
+- Team endpoints: CRUD, members, and a team's ticket queue
+- Seed data: 5 teams and demo users for each role
+- Swagger UI, Serilog logging to console and file, and a `/health` endpoint
 
-### Frontend
-- **React 18.3.1** - UI framework
-- **TypeScript 5.5.2** - Type safety
-- **Vite 5.3.2** - Build tool
-- **React Router 6.20.2** - Client-side routing
-- **TanStack Query 5.8.0** - Server state management
-- **React Hook Form 7.46.2** - Form management
-- **Zod 3.23.2** - Schema validation
-- **Lucide React 0.263.0** - Icons
-- **CSS Variables** - Theming
+**Stack:** React 18, TypeScript, Vite, TanStack Query, React Hook Form, Zod · ASP.NET Core 9, EF Core (SQLite), ASP.NET Identity, JWT, AutoMapper, FluentValidation, Serilog
 
-### Backend
-- **.NET 9.0** - Runtime
-- **ASP.NET Core** - Web framework
-- **Entity Framework Core 9.0** - ORM
-- **SQL Server** - Database
-- **JWT** - Authentication
-- **AutoMapper 12.0.1** - Object mapping
-- **FluentValidation 11.9.2** - Input validation
-- **Serilog 8.0.1** - Logging
-- **Swagger/OpenAPI** - API documentation
+## Run it
 
+```bash
+npm install
+npm run dev        # http://localhost:5173, uses the mock API
+```
 
+Backend setup is covered in [`backend/FixitBackend/README.md`](backend/FixitBackend/README.md). The JWT signing key comes from user secrets or an environment variable and is never committed.
 
-## Author
+## Roadmap
 
-Created as a professional GitHub portfolio project demonstrating enterprise-grade web application development with modern technologies.
+- [ ] Fix `Program.cs` (leftover sample code after `app.Run()`) and generate a real EF Core migration
+- [ ] Add the `/api/users` and `/api/dashboard` controllers (the services already exist)
+- [ ] Point the frontend at the real API (`VITE_USE_MOCK_API=false`, `/api` prefix) and replace the demo login with JWT sign-in
+- [ ] Store and validate refresh tokens
+- [ ] File attachments (the entity exists, but there's no endpoint yet)
+- [ ] Tests (xUnit for the services) and a GitHub Actions build
+- [ ] Deploy a live demo

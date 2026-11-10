@@ -1,6 +1,6 @@
 # FixIt Issue Tracking System - Backend API
 
-A professional-grade ASP.NET Core Web API backend for a help-desk and issue-tracking system. Built with clean architecture principles, Entity Framework Core, SQL Server, JWT authentication, and comprehensive logging.
+The ASP.NET Core Web API for FixIt, a help-desk ticketing app. It's organized in layers (Domain / Application / Infrastructure) and uses EF Core with SQLite, ASP.NET Identity + JWT and Serilog. Work in progress: see the roadmap in the root README.
 
 ## Features
 

@@ -67,26 +67,17 @@ dotnet run
 
 The API will start at: `https://localhost:7001` (HTTPS) or `http://localhost:5000` (HTTP)
 
-Update `appsettings.json` with a strong JWT secret (minimum 32 characters):
-
-```json
-"JwtSettings": {
-  "SecretKey": "your-very-long-secret-key-with-at-least-32-characters-changed-in-production",
-  "Issuer": "FixIt",
-  "Audience": "FixItClient",
-  "AccessTokenExpiryMinutes": 60
-}
-```
-
-For production, use **User Secrets** or **environment variables**:
+The JWT signing key is **not** stored in `appsettings.json`. The API won't start until you provide one (at least 32 characters). For local development, use .NET User Secrets (the project already has a `UserSecretsId`):
 
 ```bash
-# Set via environment variables
-set JwtSettings__SecretKey=your-production-secret-key
+cd backend/FixitBackend
+dotnet user-secrets set "JwtSettings:SecretKey" "$(openssl rand -base64 48)"
+```
 
-# Or using .NET User Secrets (development only)
-dotnet user-secrets init
-dotnet user-secrets set "JwtSettings:SecretKey" "your-secret-key"
+For production or Docker, set it as an environment variable instead:
+
+```bash
+JwtSettings__SecretKey=<long-random-value>
 ```
 
 ### 5. Restore Dependencies
@@ -380,7 +371,7 @@ dotnet ef database update
 ### Issue: JWT token validation fails
 
 **Solution**: Ensure:
-- Secret key in `appsettings.json` matches the key used to generate tokens
+- `JwtSettings:SecretKey` is set (user secrets or environment variable) and hasn't changed since the token was issued
 - Token hasn't expired
 - Issuer and Audience match configuration
 - Token is in the `Authorization: Bearer <token>` header

@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <UserSecretsId>fixit-backend-cfabccd9-de15-4fd7-a8df-cb3ac150024e</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
